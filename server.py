@@ -5,7 +5,9 @@ from binascii import a2b_base64
 
 from flask import Flask, Response, render_template, request, send_from_directory
 
-app = Flask(__name__, static_url_path='')
+from imagenet.lib.label_image import FacesClassificator
+
+app = Flask(__name__, static_url_path='/static', static_folder='web/static', template_folder='web/templates')
 
 
 @app.route('/')
@@ -20,9 +22,14 @@ def decode():
     head, data = img_data.split(',', 1)
     file_ext = head.split(';')[0].split('/')[1]
     binData = a2b_base64(data)
-    with open('web/faces/ebleeni.' + file_ext, 'wb') as f:
+    
+    filepath = f'web/faces/ebleeni.{file_ext}'
+    with open(filepath, 'wb') as f:
         f.write(binData)
-    result = {'php': 82, 'go': 56, 'python': 14}
+    
+    classificator = FacesClassificator()
+    result = classificator.get_probabilities(filepath)
+    
     return Response(json.dumps(result), mimetype='application/json')
 
 
