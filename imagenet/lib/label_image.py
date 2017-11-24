@@ -91,4 +91,4 @@ class FacesClassificator:
         if debug:
             print('\nEvaluation time (1-image): {:.3f}s\n'.format(end - start))
         
-        return {self._labels[i]: results[i] for i in top_k}
+        return {self._labels[i]: float(results[i]) for i in top_k}
