@@ -1,0 +1,110 @@
+<!doctype html>
+<html>
+    <head>
+        <title>ebleeni face decoder</title>
+        <link rel="stylesheet" href="/css/normalize.css">
+        <link rel="stylesheet" href="/css/skeleton.css">
+        <style>
+            html{height:100%;}
+            body{background:url('/css/bg.png') top center no-repeat/100% 100%;min-height:100%;}
+            h1{color:#FFF;font-family:Monaco;}
+            #container{margin-top:1em;text-align:center;}
+            #btn{margin-top:20px;}
+            #btn.disabled{color:#666;background-color:#CCC;border-color:#AAA;}
+            #photo{position:relative;top:0;border:6px #FFF dashed;border-radius:4px;}
+            #photo.disabled{display:none;}
+            #video{position:relative;top:0;border:6px #FFF dashed;border-radius:4px;}
+            #video.disabled{display:none;}
+            #results{display:flex;align-items:center;justify-content:center;text-align:left;margin-top:20px;}
+            #results.disabled{display:none;}
+            #results-inner{margin:0;padding:20px;background-color:rgba(0,0,0,0.75);color:#FFF;border-radius:4px;}
+            #results ul,#results li:last-child{margin-bottom:0;}
+        </style>
+    </head>
+    <body>
+        <div id="container">
+            <h1>ebleeni</h1>
+            <div id="photo-container">
+                <video id="video" width="320" height="240" autoplay></video>
+                <canvas class="disabled" id="photo" width="320" height="240"></canvas>
+            </div>
+            <button class="button-primary" id="btn" type="button">Decode face</button>
+            <div class="disabled" id="results">
+                <div id="results-inner"></div>
+            </div>
+        </div>
+        <script>
+            var video = document.getElementById('video');
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+                    video.src = window.URL.createObjectURL(stream);
+                    video.play();
+                });
+            }
+            var photo = document.getElementById('photo');
+            var video = document.getElementById('video');
+            var photoContext = photo.getContext('2d');
+            var btn = document.getElementById('btn');
+            var results = document.getElementById('results');
+            var resultsInner = document.getElementById('results-inner');
+            var mode = 'start';
+
+            function setModeStart() {
+                mode = 'start';
+                btn.classList.remove('disabled');
+                btn.firstChild.data = 'Decode face';
+                photo.classList.add('disabled');
+                video.classList.remove('disabled');
+                results.classList.add('disabled');
+            }
+            function setModeWaiting() {
+                mode = 'waiting';
+                btn.classList.add('disabled');
+                btn.firstChild.data = 'Decoding...';
+                photoContext.drawImage(video, 0, 0, 320, 240);
+                photo.classList.remove('disabled');
+                video.classList.add('disabled');
+            }
+            function setModeResults(data) {
+                mode = 'results';
+                btn.classList.remove('disabled');
+                btn.firstChild.data = 'Try again';
+                var resultsStr = '<ul>';
+                for (var lang in data) {
+                    var percent = data[lang];
+                    resultsStr += '<li>' + lang + ': ' + percent + '</li>';
+                }
+                resultsStr += '</ul>';
+                resultsInner.innerHTML = resultsStr;
+                results.classList.remove('disabled');
+            }
+
+            setModeStart();
+
+            btn.addEventListener('click', function() {
+                if (mode === 'results') {
+                    setModeStart();
+                    return;
+                }
+                if (mode === 'waiting') {
+                    return;
+                }
+                if (mode === 'start') {
+                    setModeWaiting();
+                    var photoData = photo.toDataURL('image/png');
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('POST', '/decode', true);
+                    xhr.setRequestHeader('Content-type', 'application/json');
+                    xhr.onreadystatechange = function() {
+                        if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+                            var data = JSON.parse(xhr.response);
+                            setModeResults(data);
+                        }
+                    };
+                    var jsonStr = JSON.stringify({"img": photoData});
+                    xhr.send(jsonStr);
+                }
+            });
+        </script>
+    </body>
+</html>

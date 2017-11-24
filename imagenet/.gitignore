@@ -1,0 +1,4 @@
+**/*.pyc
+tf_files
+!tf_files/.gitkeep
+.ipynb_checkpoints
