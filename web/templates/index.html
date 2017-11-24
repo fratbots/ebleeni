@@ -6,20 +6,26 @@
         <link rel="stylesheet" href="/css/skeleton.css">
         <style>
             #container{text-align:center;}
-            #btn-decode{margin-top:20px;}
-            #btn-decode.disabled{color:#666;background-color:#CCC;border-color:#AAA;}
-            #photo{}
-            #photo{display:none;}
+            #btn{margin-top:20px;}
+            #btn.disabled{color:#666;background-color:#CCC;border-color:#AAA;}
+            #photo{position:relative;top:0;}
+            #photo.disabled{display:none;}
+            #video{position:relative;top:0;}
+            #video.disabled{display:none;}
+            #results{display:flex;align-items:center;justify-content:center;text-align:left;margin-top:20px;}
+            #results.disabled{display:none;}
+            #results-inner{margin:0;}
         </style>
     </head>
     <body>
         <div id="container">
             <h1>ebleeni</h1>
-            <video id="video" width="640" height="480" autoplay></video>
-            <br>
-            <button class="button-primary" id="btn-decode" type="button">Decode the face</button>
-            <br>
-            <canvas class="disabled" id="photo" width="640" height="480"></canvas>
+            <div id="photo-container">
+                <video id="video" width="640" height="480" autoplay></video>
+                <canvas class="disabled" id="photo" width="640" height="480"></canvas>
+            </div>
+            <button class="button-primary" id="btn" type="button">Decode face</button>
+            <div class="disabled" id="results"><div id="results-inner"></div></div>
         </div>
         <script>
             var video = document.getElementById('video');
@@ -30,25 +36,70 @@
                 });
             }
             var photo = document.getElementById('photo');
-            var context = photo.getContext('2d');
             var video = document.getElementById('video');
-            var btn = document.getElementById('btn-decode');
-            document.getElementById('btn-decode').addEventListener('click', function() {
+            var photoContext = photo.getContext('2d');
+            var btn = document.getElementById('btn');
+            var results = document.getElementById('results');
+            var mode = 'start';
+
+            function setModeStart() {
+                console.log('setModeStart');
+                mode = 'start';
+                btn.classList.remove('disabled');
+                btn.firstChild.data = 'Decode face';
+                photo.classList.add('disabled');
+                video.classList.remove('disabled');
+                results.classList.add('disabled');
+            }
+            function setModeWaiting() {
+                console.log('setModeWaiting');
+                mode = 'waiting';
                 btn.classList.add('disabled');
                 btn.firstChild.data = 'Decoding...';
-                context.drawImage(video, 0, 0, 640, 480);
-                var photoData = photo.toDataURL('image/png');
-                var xhr = new XMLHttpRequest();
-                xhr.open('POST', '/decode', true);
-                xhr.setRequestHeader('Content-type', 'application/json');
-                xhr.onreadystatechange = function() {
-                    if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
-                        btn.classList.remove('disabled');
-                        btn.firstChild.data = 'Decode the face';
-                    }
-                };
-                var jsonStr = JSON.stringify({"img": photoData});
-                xhr.send(jsonStr);
+                photoContext.drawImage(video, 0, 0, 640, 480);
+                photo.classList.remove('disabled');
+                video.classList.add('disabled');
+            }
+            function setModeResults(data) {
+                console.log('setModeResults');
+                mode = 'results';
+                btn.classList.remove('disabled');
+                btn.firstChild.data = 'Try again';
+                var resultsStr = '<ul>';
+                for (var lang in data) {
+                    var percent = data[lang];
+                    resultsStr += '<li>' + lang + ': ' + percent + '</li>';
+                }
+                resultsStr += '</ul>';
+                results.innerHTML = resultsStr;
+                results.classList.remove('disabled');
+            }
+
+            setModeStart();
+
+            btn.addEventListener('click', function() {
+                if (mode === 'results') {
+                    setModeStart();
+                    return;
+                }
+                if (mode === 'waiting') {
+                    return;
+                }
+                if (mode === 'start') {
+                    setModeWaiting();
+                    var photoData = photo.toDataURL('image/png');
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('POST', '/decode', true);
+                    xhr.setRequestHeader('Content-type', 'application/json');
+                    xhr.onreadystatechange = function() {
+                        if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+                            var data = JSON.parse(xhr.response);
+                            setModeResults(data);
+                        }
+                    };
+                    var jsonStr = JSON.stringify({"img": photoData});
+                    xhr.send(jsonStr);
+                }
             });
         </script>
     </body>
