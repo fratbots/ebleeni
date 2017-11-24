@@ -1,3 +1,4 @@
 requests
 agithub
 beautifulsoup4
+opencv-python
