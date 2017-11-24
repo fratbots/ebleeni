@@ -17,8 +17,7 @@ def decode():
     binData = a2b_base64(data)
     with open('web/faces/ebleeni.' + file_ext, 'wb') as f:
         f.write(binData)
-    result = {}
-    result['result'] = 'ok'
+    result = {'php': 82, 'go': 56, 'python': 14}
     return Response(json.dumps(result), mimetype='application/json')
 
 @app.route('/css/<path:path>')
