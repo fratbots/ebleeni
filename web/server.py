@@ -1,12 +1,17 @@
-from flask import Flask, Response, render_template, send_from_directory, request
+#!/usr/bin/env python3
+
 import json
 from binascii import a2b_base64
 
+from flask import Flask, Response, render_template, request, send_from_directory
+
 app = Flask(__name__, static_url_path='')
+
 
 @app.route('/')
 def hello():
     return render_template('index.html')
+
 
 @app.route('/decode', methods=['POST'])
 def decode():
@@ -20,6 +25,11 @@ def decode():
     result = {'php': 82, 'go': 56, 'python': 14}
     return Response(json.dumps(result), mimetype='application/json')
 
+
 @app.route('/css/<path:path>')
 def send_css(path):
     return send_from_directory('static/css', path)
+
+
+if __name__ == '__main__':
+    app.run(port=5000)
