@@ -12,6 +12,7 @@ def detect_face(path: str) -> Optional[Tuple[int]]:
     """
     img = cv2.imread(path, 0)
     faces = _cascade.detectMultiScale(img, 1.1, 10)
+    del img
     if len(faces):
         return sorted(faces, key=lambda f: f[2] * f[3])[0]
 
