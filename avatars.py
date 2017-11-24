@@ -9,14 +9,14 @@ from bs4 import BeautifulSoup
 
 
 def languages_lines() -> List[str]:
-    with open('./data/languages.txt') as f:
+    with open('%s/data/languages.txt' % os.path.dirname(os.path.realpath(__file__))) as f:
         for line in f.readlines():
             yield line.rstrip()
 
 
 def languages_values() -> List[Tuple[str]]:
     for line in languages_lines():
-        arr = line.split(':', 2)
+        arr = line.split(':', 1)
         yield (arr[0], arr[1])
 
 
@@ -71,7 +71,6 @@ def lang_users_parse(value: str) -> List[Tuple[str]]:
 def lang_users(value: str) -> List[Tuple[str]]:
     path = '%s/users.txt' % lang_dir(value)
     if os.path.exists(path):
-        print('read')
         with open(path) as f:
             for line in f.readlines():
                 yield tuple(line.rstrip().split(':', 1))
@@ -83,9 +82,22 @@ def lang_users(value: str) -> List[Tuple[str]]:
             yield user, avatar
 
 
+def user_avatar_path(value, user) -> str:
+    return '%s/avatar-%s.png' % (lang_dir(value), user)
+
+
+def sure_avatar(value, user, avatar):
+    path = user_avatar_path(value, user)
+    if os.path.exists(path):
+        return
+
+    res = requests.get(avatar)
+    with open(path, mode='wb') as f:
+        f.write(res.content)
+
+
 for value, name in languages_values():
     users = lang_users(value)
     for user, avatar in users:
+        sure_avatar(value, user, avatar)
         print(user, avatar)
-
-    exit()
