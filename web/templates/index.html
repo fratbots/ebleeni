@@ -5,7 +5,7 @@
         <link rel="stylesheet" href="/css/normalize.css">
         <link rel="stylesheet" href="/css/skeleton.css">
         <style>
-            #container{text-align:center;}
+            #container{margin:1em;text-align:center;}
             #btn{margin-top:20px;}
             #btn.disabled{color:#666;background-color:#CCC;border-color:#AAA;}
             #photo{position:relative;top:0;}
@@ -21,8 +21,8 @@
         <div id="container">
             <h1>ebleeni</h1>
             <div id="photo-container">
-                <video id="video" width="640" height="480" autoplay></video>
-                <canvas class="disabled" id="photo" width="640" height="480"></canvas>
+                <video id="video" width="320" height="240" autoplay></video>
+                <canvas class="disabled" id="photo" width="320" height="240"></canvas>
             </div>
             <button class="button-primary" id="btn" type="button">Decode face</button>
             <div class="disabled" id="results"><div id="results-inner"></div></div>
@@ -43,7 +43,6 @@
             var mode = 'start';
 
             function setModeStart() {
-                console.log('setModeStart');
                 mode = 'start';
                 btn.classList.remove('disabled');
                 btn.firstChild.data = 'Decode face';
@@ -52,16 +51,14 @@
                 results.classList.add('disabled');
             }
             function setModeWaiting() {
-                console.log('setModeWaiting');
                 mode = 'waiting';
                 btn.classList.add('disabled');
                 btn.firstChild.data = 'Decoding...';
-                photoContext.drawImage(video, 0, 0, 640, 480);
+                photoContext.drawImage(video, 0, 0, 320, 240);
                 photo.classList.remove('disabled');
                 video.classList.add('disabled');
             }
             function setModeResults(data) {
-                console.log('setModeResults');
                 mode = 'results';
                 btn.classList.remove('disabled');
                 btn.firstChild.data = 'Try again';
