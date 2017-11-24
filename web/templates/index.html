@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+    <head>
+        <title>ebleeni face decoder</title>
+        <link rel="stylesheet" href="/css/normalize.css">
+        <link rel="stylesheet" href="/css/skeleton.css">
+        <style>
+            #container{text-align:center;}
+            #btn-decode{margin-top:20px;}
+            #btn-decode.disabled{color:#666;background-color:#CCC;border-color:#AAA;}
+            #photo{}
+            #photo{display:none;}
+        </style>
+    </head>
+    <body>
+        <div id="container">
+            <h1>ebleeni</h1>
+            <video id="video" width="640" height="480" autoplay></video>
+            <br>
+            <button class="button-primary" id="btn-decode" type="button">Decode the face</button>
+            <br>
+            <canvas class="disabled" id="photo" width="640" height="480"></canvas>
+        </div>
+        <script>
+            var video = document.getElementById('video');
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+                    video.src = window.URL.createObjectURL(stream);
+                    video.play();
+                });
+            }
+            var photo = document.getElementById('photo');
+            var context = photo.getContext('2d');
+            var video = document.getElementById('video');
+            var btn = document.getElementById('btn-decode');
+            document.getElementById('btn-decode').addEventListener('click', function() {
+                btn.classList.add('disabled');
+                btn.firstChild.data = 'Decoding...';
+                context.drawImage(video, 0, 0, 640, 480);
+                var photoData = photo.toDataURL('image/png');
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '/decode', true);
+                xhr.setRequestHeader('Content-type', 'application/json');
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+                        btn.classList.remove('disabled');
+                        btn.firstChild.data = 'Decode the face';
+                    }
+                };
+                var jsonStr = JSON.stringify({"img": photoData});
+                xhr.send(jsonStr);
+            });
+        </script>
+    </body>
+</html>
