@@ -11,13 +11,13 @@ from typing import Mapping
 
 class FacesClassificator:
     def __init__(self, **kwargs):
-        self._model_file = getattr(kwargs, 'graph', 'imagenet/tf_trained/retrained_graph.pb')
+        self._model_file = getattr(kwargs, 'graph', 'imagenet/tf_trained/rounded_graph.pb')
         self._label_file = getattr(kwargs, 'labels', 'imagenet/tf_trained/retrained_labels.txt')
-        self._input_height = getattr(kwargs, 'input_height', 224)
-        self._input_width = getattr(kwargs, 'input_width', 224)
+        self._input_height = getattr(kwargs, 'input_height', 299)
+        self._input_width = getattr(kwargs, 'input_width', 299)
         self._input_mean = getattr(kwargs, 'input_mean', 128)
         self._input_std = getattr(kwargs, 'input_std', 128)
-        self._input_layer = getattr(kwargs, 'input_layer', 'input')
+        self._input_layer = getattr(kwargs, 'input_layer', 'Mul')
         self._output_layer = getattr(kwargs, 'output_layer', 'final_result')
         
         self._graph = self._load_graph(self._model_file)
