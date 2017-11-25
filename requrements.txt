@@ -3,3 +3,5 @@ agithub
 beautifulsoup4
 opencv-python
 pillow
+tensorflow=1.3.0
+numpy

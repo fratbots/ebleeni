@@ -69,8 +69,9 @@
                 mode = 'results';
                 btn.classList.remove('disabled');
                 btn.firstChild.data = 'Try again';
+
                 var resultsStr = '<ul>';
-                for (var lang in data) {
+                for (var lang in data.lang) {
                     var percent = data[lang];
                     resultsStr += '<li>' + lang + ': ' + percent + '</li>';
                 }

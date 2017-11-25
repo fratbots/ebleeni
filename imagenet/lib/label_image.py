@@ -3,6 +3,7 @@ from __future__ import division
 from __future__ import print_function
 
 import time
+from collections import OrderedDict
 
 import numpy as np
 import tensorflow as tf
@@ -91,4 +92,4 @@ class FacesClassificator:
         if debug:
             print('\nEvaluation time (1-image): {:.3f}s\n'.format(end - start))
         
-        return {self._labels[i]: float(results[i]) for i in top_k}
+        return OrderedDict({self._labels[i]: round(float(results[i]), 3) for i in top_k})
