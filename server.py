@@ -10,6 +10,8 @@ from flask import Flask, Request, Response, render_template, request, send_from_
 
 import opencv
 from imagenet.lib.label_image import FacesClassificator
+from web import lib
+from web.lib.github import get_vacancies
 
 classifier = FacesClassificator()
 app = Flask(__name__, static_url_path='/static', static_folder='web/static', template_folder='web/templates')
@@ -45,6 +47,7 @@ def save_posted_image(req: Request) -> str:
 
 def cleanup_image(path: str):
     os.unlink(path)
+    # pass
 
 
 @app.route('/')
@@ -64,9 +67,10 @@ def decode():
         result = {}
 
     # Get vacations
-    # vac = github.get_vacancies(next(iter(result.keys())))
-    vac = {}
+    # vac = get_vacancies(next(iter(result.keys())))
+    vac = get_vacancies(' '.join(result.keys()))
 
+    # result = {'noclass': 0.1, 'python': 0.2}
     response = {
         'lang': result,
         'vacancy': vac,
