@@ -3,6 +3,7 @@
 import json
 from binascii import a2b_base64
 
+from web.lib import github
 from PIL import Image
 from flask import Flask, Response, render_template, request, send_from_directory
 
@@ -40,7 +41,15 @@ def decode():
     classificator = FacesClassificator()
     result = classificator.get_probabilities(filepath)
     
-    return Response(json.dumps(result), mimetype='application/json')
+    # Get vacansions
+    vac = github.get_vacancies(next(iter(result.keys())))
+
+    response = {
+        'lang': result,
+        'vacancy': vac,
+    }
+
+    return Response(json.dumps(response), mimetype='application/json')
 
 
 @app.route('/static/<path:path>')
