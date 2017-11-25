@@ -14,6 +14,8 @@ from imagenet.lib.label_image import FacesClassificator
 from web import lib
 from web.lib.github import get_vacancies
 
+import random
+
 classifier = FacesClassificator()
 app = Flask(__name__, static_url_path='/static', static_folder='web/static', template_folder='web/templates')
 
@@ -48,7 +50,6 @@ def save_posted_image(req: Request) -> str:
 
 def cleanup_image(path: str):
     os.unlink(path)
-    # pass
 
 
 @app.route('/')
@@ -92,6 +93,29 @@ def server_error(e):
     An internal error occurred: <pre>{}</pre>
     See logs for full stacktrace.
     """.format(e), 500
+
+
+def get_vacancies(langs, limit):
+    """
+    Returns vacancies stub.
+
+    Should be replaces with github-jobs or stackoverflow-jobs API calls.
+    Returns vacancies for the first lang only for testing purpose.
+    """
+    tplTitle = '{} job title {}'
+    tplDescription = '{} job description {}'
+    locations = ['helsinki', 'moscow', 'saint petersburg']
+    lang = next(iter(langs or []), None)
+    if lang is None:
+        return []
+    result = []
+    for i in range(limit):
+        result.append({
+            'title': tplTitle.format(lang, i),
+            'description': tplDescription.format(lang, i),
+            'location': random.choice(locations),
+            })
+    return result
 
 
 if __name__ == '__main__':

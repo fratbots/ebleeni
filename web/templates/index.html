@@ -19,6 +19,8 @@
             #results.disabled{display:none;}
             #results-inner{margin:0;padding:20px;background-color:rgba(0,0,0,0.75);color:#FFF;border-radius:4px;}
             #results ul,#results li:last-child{margin-bottom:0;}
+            #jobs{margin-top:1em;}
+            #jobs.disabled{display:none;}
         </style>
     </head>
     <body>
@@ -31,6 +33,8 @@
             <button class="button-primary" id="btn" type="button">Decode face</button>
             <div class="disabled" id="results">
                 <div id="results-inner"></div>
+            </div>
+            <div class="disabled" id="jobs">
             </div>
         </div>
         <script>
@@ -47,6 +51,7 @@
             var btn = document.getElementById('btn');
             var results = document.getElementById('results');
             var resultsInner = document.getElementById('results-inner');
+            var jobs = document.getElementById('jobs');
             var mode = 'start';
 
             function setModeStart() {
@@ -56,6 +61,7 @@
                 photo.classList.add('disabled');
                 video.classList.remove('disabled');
                 results.classList.add('disabled');
+                jobs.classList.add('disabled');
             }
             function setModeWaiting() {
                 mode = 'waiting';
@@ -76,22 +82,31 @@
                         has_noclass = true;
                     }
                 }
-
                 var resultsStr = '';
                 if (has_noclass) {
                     resultsStr += '<p>It seems you are not programmer yet. Try out:</p>'
                 }
 
                 resultsStr += '<ul>';
-                for (var lang in data.lang) {
-                    var percent = data.lang[lang];
+                for (var langKey in data.lang) {
+                    var percent = data.lang[langKey];
                     if (lang != 'noclass') {
-                        resultsStr += '<li>' + lang + ': ' + percent + '</li>';
+                        resultsStr += '<li>' + escape(langKey) + ': ' + escape(percent) + '</li>';
                     }
                 }
                 resultsStr += '</ul>';
                 resultsInner.innerHTML = resultsStr;
                 results.classList.remove('disabled');
+                var jobsStr = '<ul>';
+                for (var job in data.vac) {
+                    jobsStr += '<li>';
+                    jobsStr += '<h3>' + escape(job['title']) + '</h3>';
+                    jobsStr += '<p class="description">' + escape(job['description']) + '</p>';
+                    jobsStr += '<p class="location">' + escape(job['location']) + '</p>';
+                    jobsStr += '</li>';
+                }
+                jobsStr += '</ul>';
+                jobs.classList.remove('disabled');
             }
 
             setModeStart();
