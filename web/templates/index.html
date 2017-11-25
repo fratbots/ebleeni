@@ -70,10 +70,24 @@
                 btn.classList.remove('disabled');
                 btn.firstChild.data = 'Try again';
 
-                var resultsStr = '<ul>';
+                var has_noclass = false
+                for (var l in data.lang) {
+                    if (l == 'noclass') {
+                        has_noclass = true;
+                    }
+                }
+
+                var resultsStr = '';
+                if (has_noclass) {
+                    resultsStr += '<p>It seems you are not programmer yet. Try out:</p>'
+                }
+
+                resultsStr += '<ul>';
                 for (var lang in data.lang) {
                     var percent = data.lang[lang];
-                    resultsStr += '<li>' + lang + ': ' + percent + '</li>';
+                    if (lang != 'noclass') {
+                        resultsStr += '<li>' + lang + ': ' + percent + '</li>';
+                    }
                 }
                 resultsStr += '</ul>';
                 resultsInner.innerHTML = resultsStr;
