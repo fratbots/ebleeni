@@ -15,18 +15,16 @@
             #photo.disabled{display:none;}
             #video{position:relative;top:0;border:6px #FFF dashed;border-radius:4px;}
             #video.disabled{display:none;}
-            #results{display:flex;align-items:center;justify-content:center;text-align:left;margin-top:1em;}
-            #results.disabled{display:none;}
+            #resjobs{margin-top:2em;margin-bottom:2em;}
+            #resjobs.disabled{display:none;}
+            #results{display:inline-block;align-items:center;justify-content:center;text-align:left;}
             #results-inner{margin:0;padding:20px;background-color:rgba(0,0,0,0.75);color:#FFF;border-radius:4px;}
             #results ul,#results li:last-child{margin-bottom:0;}
-            #jobs{display:flex;align-items:center;justify-content:center;text-align:left;margin-top:2em;margin-bottom:2em;}
-            #jobs.disabled{display:none;}
+            #jobs{display:inline-block;align-items:center;justify-content:center;text-align:left;}
             #jobs-inner{margin-top:0;margin-left:2em;margin-right:2em;padding:2em;background-color:rgba(255,255,255,0.75);border-radius:4px;}
+            #jobs ul{margin-bottom:0;}
             #jobs li{list-style:none;}
             #jobs li:last-child{margin-bottom:0;}
-            #jobs h3{margin-bottom:0.3em;}
-            #jobs .location{margin-bottom:0;font-size:0.7em;font-weight:bold;color:#666;}
-            #jobs .description{max-height:200px;overflow-y:auto;}
         </style>
     </head>
     <body>
@@ -37,11 +35,13 @@
                 <canvas class="disabled" id="photo" width="320" height="240"></canvas>
             </div>
             <button class="button-primary" id="btn" type="button">Decode face</button>
-            <div class="disabled" id="results">
-                <div id="results-inner"></div>
-            </div>
-            <div class="disabled" id="jobs">
-                <div id="jobs-inner"></div>
+            <div class="disabled" id="resjobs">
+                <div id="results">
+                    <div id="results-inner"></div>
+                </div>
+                <div id="jobs">
+                    <div id="jobs-inner"></div>
+                </div>
             </div>
         </div>
         <script>
@@ -58,6 +58,7 @@
             var btn = document.getElementById('btn');
             var results = document.getElementById('results');
             var resultsInner = document.getElementById('results-inner');
+            var resjobs = document.getElementById('resjobs');
             var jobs = document.getElementById('jobs');
             var jobsInner = document.getElementById('jobs-inner');
             var mode = 'start';
@@ -68,8 +69,7 @@
                 btn.firstChild.data = 'Decode face';
                 photo.classList.add('disabled');
                 video.classList.remove('disabled');
-                results.classList.add('disabled');
-                jobs.classList.add('disabled');
+                resjobs.classList.add('disabled');
             }
             function setModeWaiting() {
                 mode = 'waiting';
@@ -101,7 +101,6 @@
                 if (has_noclass) {
                     resultsStr += '<p>It seems you are not programmer yet.<br>We think the following languages suits you best:</p>'
                 }
-
                 resultsStr += '<ul>';
                 for (var langKey in data.lang) {
                     var percent = data.lang[langKey];
@@ -111,19 +110,17 @@
                 }
                 resultsStr += '</ul>';
                 resultsInner.innerHTML = resultsStr;
-                results.classList.remove('disabled');
-                var jobsStr = '<h2>Jobs</h2><ul>';
+                var jobsStr = '<ul>';
                 for (var jobKey in data.jobs) {
                     var job = data.jobs[jobKey];
-                    jobsStr += '<li>';
-                    jobsStr += '<h3><a href="' + job['url'] + '">' + escapeHTML(job['title']) + '</a></h3>';
-                    jobsStr += '<p class="location">' + escapeHTML(job['location']) + '</p>';
-                    jobsStr += '<div class="description">' + job['description'] + '</div>';
-                    jobsStr += '</li>';
+                    jobsStr += '<li><a href="' + job['url'] + '">'
+                        + escapeHTML(job['title']) + '</a>, '
+                        + escapeHTML(job['location'])
+                        + '</li>';
                 }
                 jobsStr += '</ul>';
                 jobsInner.innerHTML = jobsStr;
-                jobs.classList.remove('disabled');
+                resjobs.classList.remove('disabled');
             }
 
             setModeStart();
