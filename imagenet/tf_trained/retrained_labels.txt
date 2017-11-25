@@ -1,7 +1,6 @@
 c 
 go
 python
-css
 rust
 java
 kotlin
