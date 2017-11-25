@@ -7,31 +7,18 @@ import random
 import uuid
 from binascii import a2b_base64
 from collections import OrderedDict
-from pprint import pprint
 from typing import Mapping, Optional
 
+import flask
 from PIL import Image
 from flask import Flask, Request, Response, render_template, request, send_from_directory
 
 import opencv
 from imagenet.lib.label_image import FacesClassificator
-
 from web.lib import github
 
 classifier = FacesClassificator()
-app = Flask(__name__, static_url_path='/static', static_folder='web/static', template_folder='web/templates')
-
-
-def crop_face(path: str) -> bool:
-    face = opencv.detect_face(path)
-    if face is not None:
-        img = Image.open(path)
-        img2 = img.crop((face[0], face[1], face[0] + face[2], face[1] + face[3]))
-        img2.save(path)
-        del img
-        del img2
-        return True
-    return False
+app = Flask(__name__, static_folder='web/static', template_folder='web/templates')
 
 
 def make_session() -> str:
@@ -42,8 +29,29 @@ def image_path(session: str, ext: str = None):
     return 'web/faces/ebleeni-%s.%s' % (session, ext if ext else 'png')
 
 
+def crop_path(session: str, ext: str = None):
+    return 'web/faces/ebleeni-%s-crop.%s' % (session, ext if ext else 'png')
+
+
 def result_path(session: str):
     return 'web/faces/ebleeni-%s-result.json' % session
+
+
+def image_url_path(session: str):
+    return '/faces/ebleeni-%s.png' % session
+
+
+def crop_face(session, path: str) -> Optional[str]:
+    face = opencv.detect_face(path)
+    if face is not None:
+        img = Image.open(path)
+        img2 = img.crop((face[0], face[1], face[0] + face[2], face[1] + face[3]))
+        c_path = crop_path(session)
+        img2.save(c_path)
+        del img
+        del img2
+        return c_path
+    return None
 
 
 def save_posted_image(session: str, req: Request) -> str:
@@ -76,7 +84,6 @@ def load_result(session: str) -> Optional[Mapping[str, float]]:
         with open(path) as f:
             for line in f.readlines():
                 pair = line.strip().split(':', 1)
-                pprint(pair)
                 if len(pair) == 2:
                     result[pair[0]] = float(pair[1])
         return result
@@ -94,19 +101,23 @@ def decode():
     path = save_posted_image(session, request)
     result = {}
     jobs = []
+    cropped_path = False
     try:
-        cropped = crop_face(path)
-        result = analise(path)
-        if not cropped:
+        cropped_path = crop_face(session, path)
+        if cropped_path is None:
             result['noclass'] = 1.0
         else:
+            result = analise(cropped_path)
             jobs = get_jobs(result.keys(), 5)
-        save_result(session, result)
+            save_result(session, result)
+            os.unlink(cropped_path)
     except Exception as e:
         result = {}
 
     response = {
-        'cropped': cropped,
+        'session': session,
+        'face': '',
+        'cropped': False if cropped_path is None else True,
         'lang': result,
         'jobs': jobs,
     }
@@ -119,11 +130,19 @@ def send_css(path):
     return send_from_directory('static', path)
 
 
+@app.route('/faces/<path:path>')
+def faces(path):
+    return send_from_directory('web/faces', path)
+
+
 @app.route('/report/<session>')
 def report(session):
     result = load_result(session)
-    print(result)
+    if result is None:
+        return flask.abort(404)
     return render_template('index.html', data={
+        'session': session,
+        'face': image_url_path(session),
         'cropped': True,
         'lang': result,
         'jobs': get_jobs(result.keys(), 5),

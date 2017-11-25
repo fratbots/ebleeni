@@ -125,6 +125,10 @@
 
             setModeStart();
 
+            {% if data %}
+            setModeResults({{ data | tojson }})
+            {% endif %}
+
             btn.addEventListener('click', function() {
                 if (mode === 'results') {
                     setModeStart();
