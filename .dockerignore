@@ -1,0 +1,5 @@
+**/*.pyc
+imagenet/tf_files
+imagenet/.ipynb_checkpoints
+.git
+google-cloud-sdk

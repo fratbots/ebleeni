@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.6
 
 import json
 import logging
@@ -15,6 +15,8 @@ from flask import Flask, Request, Response, render_template, request, send_from_
 
 import opencv
 from imagenet.lib.label_image import FacesClassificator
+
+from web.lib import github
 
 classifier = FacesClassificator()
 app = Flask(__name__, static_url_path='/static', static_folder='web/static', template_folder='web/templates')
@@ -90,17 +92,18 @@ def hello():
 def decode():
     session = make_session()
     path = save_posted_image(session, request)
+    result = {}
+    jobs = []
     try:
         cropped = crop_face(path)
         result = analise(path)
         if not cropped:
             result['noclass'] = 1.0
+        else:
+            jobs = get_jobs(result.keys(), 5)
         save_result(session, result)
     except Exception as e:
-        raise e
         result = {}
-
-    jobs = get_jobs(result.keys(), 5)
 
     response = {
         'cropped': cropped,
@@ -137,6 +140,18 @@ def server_error(e):
 
 
 def get_jobs(langs, limit):
+    """
+    Returns jobs appropriate for specified programming languages.
+
+    Tries to find jobs on github, then gives up and returns static stubs.
+    """
+    githubJobs = github.get_jobs(langs, limit)
+    if len(githubJobs) > 0:
+        return githubJobs
+    return get_job_stubs(langs, limit)
+
+
+def get_job_stubs(langs, limit):
     """
     Returns jobs stub.
 
