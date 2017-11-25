@@ -3,8 +3,10 @@
 import json
 from binascii import a2b_base64
 
+from PIL import Image
 from flask import Flask, Response, render_template, request, send_from_directory
 
+import opencv
 from imagenet.lib.label_image import FacesClassificator
 
 app = Flask(__name__, static_url_path='/static', static_folder='web/static', template_folder='web/templates')
@@ -26,7 +28,15 @@ def decode():
     filepath = f'web/faces/ebleeni.{file_ext}'
     with open(filepath, 'wb') as f:
         f.write(binData)
-    
+
+    face = opencv.detect_face(filepath)
+    if face is not None:
+        img = Image.open(filepath)
+        img2 = img.crop((face[0], face[1], face[0]+face[2], face[1]+face[3]))
+        img2.save(filepath)
+        del img
+        del img2
+
     classificator = FacesClassificator()
     result = classificator.get_probabilities(filepath)
     
