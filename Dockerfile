@@ -8,4 +8,6 @@ WORKDIR /app
 RUN pip3 install -r requirements.txt
 
 CMD ["/usr/local/bin/gunicorn", "-b", ":8080", "-k", "sync", "-w", "3", "server:app"]
+
+# For local testing:
 # /usr/local/bin/gunicorn -b :8080 -k sync -w 3 server:app
