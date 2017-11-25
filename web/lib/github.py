@@ -10,7 +10,7 @@ def get_jobs(langs, limit):
     for lang in langs:
         jobs = jobs + get_jobs_by_lang(lang)
         if len(jobs) >= limit:
-            return jobs
+            return jobs[:limit]
     return jobs
 
 
@@ -24,7 +24,6 @@ def get_jobs_by_lang(lang):
         result.append({
             'title': job['title'],
             'location': job['location'],
-            'description': job['description'],
             'url': job['url'],
             })
     return result
