@@ -6,6 +6,9 @@ import os
 import random
 import uuid
 from binascii import a2b_base64
+from collections import OrderedDict
+from pprint import pprint
+from typing import Mapping, Optional
 
 from PIL import Image
 from flask import Flask, Request, Response, render_template, request, send_from_directory
@@ -29,24 +32,53 @@ def crop_face(path: str) -> bool:
     return False
 
 
-def image_path(ext: str = None):
-    return 'web/faces/ebleeni-%s.%s' % (str(uuid.uuid4()), ext if ext else 'png')
+def make_session() -> str:
+    return str(uuid.uuid4())
 
 
-def save_posted_image(req: Request) -> str:
+def image_path(session: str, ext: str = None):
+    return 'web/faces/ebleeni-%s.%s' % (session, ext if ext else 'png')
+
+
+def result_path(session: str):
+    return 'web/faces/ebleeni-%s-result.json' % session
+
+
+def save_posted_image(session: str, req: Request) -> str:
     req = req.get_json()
     img_data = req['img']
     head, data = img_data.split(',', 1)
     file_ext = head.split(';')[0].split('/')[1]
     data = a2b_base64(data)
-    path = image_path(file_ext)
+    path = image_path(session, file_ext)
     with open(path, 'wb') as f:
         f.write(data)
     return path
 
 
-def cleanup_image(path: str):
-    os.unlink(path)
+def analise(path: str) -> Mapping[str, float]:
+    return classifier.get_probabilities(path)
+
+
+def save_result(session: str, result: Mapping[str, float]) -> bool:
+    with open(result_path(session), mode='w') as f:
+        for lang, value in result.items():
+            f.write('%s:%s\n' % (lang, value))
+    return True
+
+
+def load_result(session: str) -> Optional[Mapping[str, float]]:
+    path = result_path(session)
+    if os.path.exists(path):
+        result = OrderedDict()
+        with open(path) as f:
+            for line in f.readlines():
+                pair = line.strip().split(':', 1)
+                pprint(pair)
+                if len(pair) == 2:
+                    result[pair[0]] = float(pair[1])
+        return result
+    return None
 
 
 @app.route('/')
@@ -56,20 +88,22 @@ def hello():
 
 @app.route('/decode', methods=['POST'])
 def decode():
-    path = save_posted_image(request)
+    session = make_session()
+    path = save_posted_image(session, request)
     try:
         cropped = crop_face(path)
-        result = classifier.get_probabilities(path)
-        # cleanup_image(path)
+        result = analise(path)
         if not cropped:
             result['noclass'] = 1.0
-    except Exception:
-        # cleanup_image(path)
+        save_result(session, result)
+    except Exception as e:
+        raise e
         result = {}
 
     jobs = get_jobs(result.keys(), 5)
 
     response = {
+        'cropped': cropped,
         'lang': result,
         'jobs': jobs,
     }
@@ -80,6 +114,17 @@ def decode():
 @app.route('/static/<path:path>')
 def send_css(path):
     return send_from_directory('static', path)
+
+
+@app.route('/report/<session>')
+def report(session):
+    result = load_result(session)
+    print(result)
+    return render_template('index.html', data={
+        'cropped': True,
+        'lang': result,
+        'jobs': get_jobs(result.keys(), 5),
+    })
 
 
 @app.errorhandler(500)
