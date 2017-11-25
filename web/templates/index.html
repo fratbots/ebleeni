@@ -98,7 +98,7 @@
                 }
                 var resultsStr = '';
                 if (has_noclass) {
-                    resultsStr += '<p>It seems you are not programmer yet. Try out:</p>'
+                    resultsStr += '<p>It seems you are not programmer yet.<br>We think the following languages suits you best:</p>'
                 }
 
                 resultsStr += '<ul>';
@@ -117,7 +117,7 @@
                     jobsStr += '<li>';
                     jobsStr += '<h3><a href="' + job['url'] + '">' + escapeHTML(job['title']) + '</a></h3>';
                     jobsStr += '<p class="location">' + escapeHTML(job['location']) + '</p>';
-                    jobsStr += '<p class="description">' + escapeHTML(job['description']) + '</p>';
+                    jobsStr += '<p class="description">' + job['description'] + '</p>';
                     jobsStr += '</li>';
                 }
                 jobsStr += '</ul>';
