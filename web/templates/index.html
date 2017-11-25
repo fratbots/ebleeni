@@ -97,7 +97,7 @@
                 resultsStr += '<ul>';
                 for (var langKey in data.lang) {
                     var percent = data.lang[langKey];
-                    if (lang != 'noclass') {
+                    if (langKey != 'noclass') {
                         resultsStr += '<li>' + escapeHTML(langKey) + ': ' + escapeHTML(percent) + '</li>';
                     }
                 }
