@@ -4,6 +4,12 @@
         <title>ebleeni face decoder</title>
         <link rel="stylesheet" href="/static/normalize.css">
         <link rel="stylesheet" href="/static/skeleton.css">
+
+        <meta property="og:title" content="Ebleeni! Your programming perspective!">
+        <meta property="og:description" {% if data %} content="Custom test description" {% endif %}>
+        <meta property="og:iamge" {% if data %} content="http://ogp.me/logo.png" {% endif %}>
+        <meta property="og:url" {% if data %} content="http://yandex.ru" {% endif %}>
+
         <style>
             html{height:100%;}
             body{background:url('/static/bg.png') top center no-repeat/100% 100%;background-attachment:fixed;min-height:100%;}
@@ -11,11 +17,14 @@
             #container{margin-top:1em;text-align:center;}
             #btn{margin-top:20px;}
             #btn.disabled{color:#666;background-color:#CCC;border-color:#AAA;}
+            #btn.hidden{display:none;}
             #photo{position:relative;top:0;border:6px #FFF dashed;border-radius:4px;}
             #photo.disabled{display:none;}
             #video{position:relative;top:0;border:6px #FFF dashed;border-radius:4px;}
             #video.disabled{display:none;}
-            #resjobs{margin-top:2em;margin-bottom:2em;}
+            #report-img {position:relative;top:0;border:6px #FFF dashed;border-radius:4px;display:inline-block;line-height:1rem;}
+            #report-img.disabled{display:none;}
+            #resjobs>div{margin-top:2em;margin-bottom:2em;}
             #resjobs.disabled{display:none;}
             #results{display:inline-block;align-items:center;justify-content:center;text-align:left;vertical-align:top;}
             #results-inner{margin:0;padding:20px;background-color:rgba(0,0,0,0.75);color:#FFF;border-radius:4px;}
@@ -26,6 +35,9 @@
             #jobs li{list-style:none;}
             #jobs li:last-child{margin-bottom:0;}
         </style>
+
+        <script src="https://yastatic.net/es5-shims/0.0.2/es5-shims.min.js"></script>
+        <script src="https://yastatic.net/share2/share.js" async="async"></script>
     </head>
     <body>
         <div id="container">
@@ -33,6 +45,7 @@
             <div id="photo-container">
                 <video id="video" width="320" height="240" autoplay></video>
                 <canvas class="disabled" id="photo" width="320" height="240"></canvas>
+                <div class="disabled" id="report-img"></div>
             </div>
             <button class="button-primary" id="btn" type="button">Decode face</button>
             <div class="disabled" id="resjobs">
@@ -43,7 +56,10 @@
                     <div id="jobs-inner"></div>
                 </div>
             </div>
+
+            <div id="my-share"></div>
         </div>
+
         <script>
             var video = document.getElementById('video');
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -54,6 +70,7 @@
             }
             var photo = document.getElementById('photo');
             var video = document.getElementById('video');
+            var reportImg = document.getElementById('report-img');
             var photoContext = photo.getContext('2d');
             var btn = document.getElementById('btn');
             var results = document.getElementById('results');
@@ -62,6 +79,10 @@
             var jobs = document.getElementById('jobs');
             var jobsInner = document.getElementById('jobs-inner');
             var mode = 'start';
+            var escape = document.createElement('textarea');
+
+            var myShare = document.getElementById('my-share');
+            var share = null;
 
             function setModeStart() {
                 mode = 'start';
@@ -70,6 +91,8 @@
                 photo.classList.add('disabled');
                 video.classList.remove('disabled');
                 resjobs.classList.add('disabled');
+
+                destroyShareButtons();
             }
             function setModeWaiting() {
                 mode = 'waiting';
@@ -80,18 +103,24 @@
                 video.classList.add('disabled');
             }
 
-            var escape = document.createElement('textarea');
             function escapeHTML(html) {
                 escape.textContent = html;
                 return escape.innerHTML;
             }
 
             function setModeResults(data) {
+                {% if data %}
+                    reportImg.innerHTML = '<img src="' + data.face + '">';
+                    reportImg.classList.remove('disabled');
+                    btn.classList.add('hidden');
+                    photo.classList.add('disabled');
+                    video.classList.add('disabled');
+                {% endif %}
                 mode = 'results';
                 btn.classList.remove('disabled');
                 btn.firstChild.data = 'Try again';
 
-                var has_noclass = false
+                var has_noclass = false;
                 for (var l in data.lang) {
                     if (l == 'noclass') {
                         has_noclass = true;
@@ -121,13 +150,59 @@
                 jobsStr += '</ul>';
                 jobsInner.innerHTML = jobsStr;
                 resjobs.classList.remove('disabled');
+
+                // Draw social buttons
+                showShareButtons(data);
             }
 
-            setModeStart();
+            function setMeta(property, value) {
+                var metaTags=document.getElementsByTagName("meta");
+                for (var i = 0; i < metaTags.length; i++) {
+                    if (metaTags[i].getAttribute("property") == property) {
+                        metaContent = metaTags[i].setAttribute("content", value);
+                        break;
+                    }
+                }
+            }
 
-            {% if data %}
-            setModeResults({{ data | tojson }})
-            {% endif %}
+            function showShareButtons(data) {
+                var url = window.location.origin + window.location.pathname + 'report/' + data.session;
+                var imageUrl = window.location.origin + window.location.pathname + 'faces/ebleeni-' + data.session + '.png';
+                var description = '';
+
+                for (var lang in data.lang) {
+                    if (!data.lang.hasOwnProperty(lang)) {
+                        continue
+                    }
+
+                    var percent = data.lang[lang];
+                    description += lang.charAt(0).toUpperCase() + lang.slice(1);
+                    description += ': ' + percent + '. ';
+                }
+
+                setMeta("og:image", imageUrl);
+                setMeta("og:description", description);
+                setMeta("og:url", url);
+
+                share = Ya.share2(myShare, {
+                    content: {
+                        url: url,
+                        title: 'Ebleeni! Your programming prerogative!',
+                        description: description,
+                        image: imageUrl
+                    }
+                   // здесь вы можете указать и другие параметры
+                });
+            }
+
+            function destroyShareButtons() {
+                if (share) {
+                    share.destroy();
+                    setMeta("og:image", "");
+                    setMeta("og:description", "Your programming prerogative!");
+                    setMeta("og:url", "");
+                }
+            }
 
             btn.addEventListener('click', function() {
                 if (mode === 'results') {
@@ -153,6 +228,12 @@
                     xhr.send(jsonStr);
                 }
             });
+
+            setModeStart();
+
+            {% if data %}
+            setModeResults({{ data | tojson }})
+            {% endif %}
         </script>
     </body>
 </html>
