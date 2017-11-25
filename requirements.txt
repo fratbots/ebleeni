@@ -8,3 +8,4 @@ opencv-python==3.3.0.10
 pillow
 tensorflow==1.3.0
 numpy
+typing

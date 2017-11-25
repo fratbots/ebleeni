@@ -14,3 +14,7 @@ resources:
 
 skip_files:
 - imagenet/tf_files/
+
+network:
+  forwarded_ports:
+    - 80:8080/tcp
