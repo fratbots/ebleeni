@@ -71,6 +71,13 @@
                 photo.classList.remove('disabled');
                 video.classList.add('disabled');
             }
+
+            var escape = document.createElement('textarea');
+            function escapeHTML(html) {
+                escape.textContent = html;
+                return escape.innerHTML;
+            }
+
             function setModeResults(data) {
                 mode = 'results';
                 btn.classList.remove('disabled');
@@ -91,21 +98,25 @@
                 for (var langKey in data.lang) {
                     var percent = data.lang[langKey];
                     if (lang != 'noclass') {
-                        resultsStr += '<li>' + escape(langKey) + ': ' + escape(percent) + '</li>';
+                        resultsStr += '<li>' + escapeHTML(langKey) + ': ' + escapeHTML(percent) + '</li>';
                     }
                 }
                 resultsStr += '</ul>';
                 resultsInner.innerHTML = resultsStr;
                 results.classList.remove('disabled');
                 var jobsStr = '<ul>';
-                for (var job in data.vac) {
+                console.log(data.jobs);
+                for (var jobKey in data.jobs) {
+                    var job = data.jobs[jobKey];
+                    console.log(job);
                     jobsStr += '<li>';
-                    jobsStr += '<h3>' + escape(job['title']) + '</h3>';
-                    jobsStr += '<p class="description">' + escape(job['description']) + '</p>';
-                    jobsStr += '<p class="location">' + escape(job['location']) + '</p>';
+                    jobsStr += '<h3><a href="' + job['url'] + '">' + escapeHTML(job['title']) + '</a></h3>';
+                    jobsStr += '<p class="description">' + escapeHTML(job['description']) + '</p>';
+                    jobsStr += '<p class="location">' + escapeHTML(job['location']) + '</p>';
                     jobsStr += '</li>';
                 }
                 jobsStr += '</ul>';
+                jobs.innerHTML = jobsStr;
                 jobs.classList.remove('disabled');
             }
 
