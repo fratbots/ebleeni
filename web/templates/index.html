@@ -6,7 +6,7 @@
         <link rel="stylesheet" href="/static/skeleton.css">
         <style>
             html{height:100%;}
-            body{background:url('/static/bg.png') top center no-repeat/100% 100%;min-height:100%;}
+            body{background:url('/static/bg.png') top center no-repeat/100% 100%;background-attachment:fixed;min-height:100%;}
             h1{color:#FFF;font-family:Monaco;}
             #container{margin-top:1em;text-align:center;}
             #btn{margin-top:20px;}
@@ -15,12 +15,17 @@
             #photo.disabled{display:none;}
             #video{position:relative;top:0;border:6px #FFF dashed;border-radius:4px;}
             #video.disabled{display:none;}
-            #results{display:flex;align-items:center;justify-content:center;text-align:left;margin-top:20px;}
+            #results{display:flex;align-items:center;justify-content:center;text-align:left;margin-top:1em;}
             #results.disabled{display:none;}
             #results-inner{margin:0;padding:20px;background-color:rgba(0,0,0,0.75);color:#FFF;border-radius:4px;}
             #results ul,#results li:last-child{margin-bottom:0;}
-            #jobs{margin-top:1em;}
+            #jobs{display:flex;align-items:center;justify-content:center;text-align:left;margin-top:2em;margin-bottom:2em;}
             #jobs.disabled{display:none;}
+            #jobs-inner{margin-top:0;padding:20px;background-color:rgba(255,255,255,0.75);border-radius:4px;}
+            #jobs li{list-style:none;}
+            #jobs li:last-child{margin-bottom:0;}
+            #jobs h3{margin-bottom:0.3em;}
+            #jobs .location{margin-bottom:0;font-size:0.7em;font-weight:bold;color:#666;}
         </style>
     </head>
     <body>
@@ -35,6 +40,7 @@
                 <div id="results-inner"></div>
             </div>
             <div class="disabled" id="jobs">
+                <div id="jobs-inner"></div>
             </div>
         </div>
         <script>
@@ -52,6 +58,7 @@
             var results = document.getElementById('results');
             var resultsInner = document.getElementById('results-inner');
             var jobs = document.getElementById('jobs');
+            var jobsInner = document.getElementById('jobs-inner');
             var mode = 'start';
 
             function setModeStart() {
@@ -104,17 +111,17 @@
                 resultsStr += '</ul>';
                 resultsInner.innerHTML = resultsStr;
                 results.classList.remove('disabled');
-                var jobsStr = '<ul>';
+                var jobsStr = '<h2>Jobs</h2><ul>';
                 for (var jobKey in data.jobs) {
                     var job = data.jobs[jobKey];
                     jobsStr += '<li>';
                     jobsStr += '<h3><a href="' + job['url'] + '">' + escapeHTML(job['title']) + '</a></h3>';
-                    jobsStr += '<p class="description">' + escapeHTML(job['description']) + '</p>';
                     jobsStr += '<p class="location">' + escapeHTML(job['location']) + '</p>';
+                    jobsStr += '<p class="description">' + escapeHTML(job['description']) + '</p>';
                     jobsStr += '</li>';
                 }
                 jobsStr += '</ul>';
-                jobs.innerHTML = jobsStr;
+                jobsInner.innerHTML = jobsStr;
                 jobs.classList.remove('disabled');
             }
 
