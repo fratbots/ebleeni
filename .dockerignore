@@ -3,3 +3,5 @@ imagenet/tf_files
 imagenet/.ipynb_checkpoints
 .git
 google-cloud-sdk
+web/faces
+data
