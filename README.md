@@ -14,3 +14,8 @@ Run web server
     make run
 
 Server will listen on localhost:5000.
+
+Create docker image
+-------------------
+
+    make build
