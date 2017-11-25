@@ -1,5 +1,29 @@
-roses
-sunflowers
-daisy
-dandelion
-tulips
+pascal
+common lisp
+c 
+go
+python
+css
+asp
+shell
+perl
+typescript
+visual basic
+rust
+erlang
+r
+java
+kotlin
+haskell
+php
+lua
+noclass
+scala
+swift
+coffeescript
+javascript
+f 
+c
+objective c
+ruby
+sql
