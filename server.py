@@ -1,16 +1,50 @@
 #!/usr/bin/env python3
 
 import json
+import os
+import uuid
 from binascii import a2b_base64
 
-from web.lib import github
 from PIL import Image
-from flask import Flask, Response, render_template, request, send_from_directory
+from flask import Flask, Request, Response, render_template, request, send_from_directory
 
 import opencv
 from imagenet.lib.label_image import FacesClassificator
 
+classifier = FacesClassificator()
 app = Flask(__name__, static_url_path='/static', static_folder='web/static', template_folder='web/templates')
+
+
+def crop_face(path: str) -> bool:
+    face = opencv.detect_face(path)
+    if face is not None:
+        img = Image.open(path)
+        img2 = img.crop((face[0], face[1], face[0] + face[2], face[1] + face[3]))
+        img2.save(path)
+        del img
+        del img2
+        return True
+    return False
+
+
+def image_path(ext: str = None):
+    return 'web/faces/ebleeni-%s.%s' % (str(uuid.uuid4()), ext if ext else 'png')
+
+
+def save_posted_image(req: Request) -> str:
+    req = req.get_json()
+    img_data = req['img']
+    head, data = img_data.split(',', 1)
+    file_ext = head.split(';')[0].split('/')[1]
+    data = a2b_base64(data)
+    path = image_path(file_ext)
+    with open(path, 'wb') as f:
+        f.write(data)
+    return path
+
+
+def cleanup_image(path: str):
+    os.unlink(path)
 
 
 @app.route('/')
@@ -20,29 +54,18 @@ def hello():
 
 @app.route('/decode', methods=['POST'])
 def decode():
-    req = request.get_json()
-    img_data = req['img']
-    head, data = img_data.split(',', 1)
-    file_ext = head.split(';')[0].split('/')[1]
-    binData = a2b_base64(data)
-    
-    filepath = f'web/faces/ebleeni.{file_ext}'
-    with open(filepath, 'wb') as f:
-        f.write(binData)
+    path = save_posted_image(request)
+    try:
+        crop_face(path)
+        result = classifier.get_probabilities(path)
+        cleanup_image(path)
+    except Exception:
+        cleanup_image(path)
+        result = {}
 
-    face = opencv.detect_face(filepath)
-    if face is not None:
-        img = Image.open(filepath)
-        img2 = img.crop((face[0], face[1], face[0]+face[2], face[1]+face[3]))
-        img2.save(filepath)
-        del img
-        del img2
-
-    classificator = FacesClassificator()
-    result = classificator.get_probabilities(filepath)
-    
-    # Get vacansions
-    vac = github.get_vacancies(next(iter(result.keys())))
+    # Get vacations
+    # vac = github.get_vacancies(next(iter(result.keys())))
+    vac = {}
 
     response = {
         'lang': result,

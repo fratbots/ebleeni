@@ -7,7 +7,7 @@ from collections import OrderedDict
 
 import numpy as np
 import tensorflow as tf
-
+from typing import Mapping
 
 class FacesClassificator:
     def __init__(self, **kwargs):
@@ -68,7 +68,7 @@ class FacesClassificator:
             label.append(l.rstrip())
         return label
     
-    def get_probabilities(self, file_name, debug=False):
+    def get_probabilities(self, file_name, debug=False) -> Mapping[str, float]:
         t = self._read_tensor_from_image_file(file_name,
                                               input_height=self._input_height,
                                               input_width=self._input_width,
