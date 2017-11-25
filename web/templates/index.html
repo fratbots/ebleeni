@@ -126,7 +126,7 @@
 
                 var has_noclass = false;
                 for (var l in data.lang) {
-                    if (l == 'noclass') {
+                    if (l == 'noclass' && data.lang[l] > 0.9) {
                         has_noclass = true;
                     }
                 }
