@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import json
+import logging
 import os
 import uuid
 from binascii import a2b_base64
@@ -84,5 +85,14 @@ def send_css(path):
     return send_from_directory('static', path)
 
 
+@app.errorhandler(500)
+def server_error(e):
+    logging.exception('An error occurred during a request.')
+    return """
+    An internal error occurred: <pre>{}</pre>
+    See logs for full stacktrace.
+    """.format(e), 500
+
+
 if __name__ == '__main__':
-    app.run(port=5000)
+    app.run(port=5000, debug=True)
