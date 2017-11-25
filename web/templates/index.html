@@ -72,7 +72,7 @@
 
                 var resultsStr = '<ul>';
                 for (var lang in data.lang) {
-                    var percent = data[lang];
+                    var percent = data.lang[lang];
                     resultsStr += '<li>' + lang + ': ' + percent + '</li>';
                 }
                 resultsStr += '</ul>';

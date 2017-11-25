@@ -3,6 +3,11 @@ ebleeni
 
 Reads your face to tell which programming language best suits you.
 
+Setup
+-----
+
+    pip3 install -r requirements.txt
+
 Run web server
 --------------
 
