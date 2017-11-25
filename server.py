@@ -68,14 +68,11 @@ def decode():
         cleanup_image(path)
         result = {}
 
-    # Get vacations
-    # vac = get_vacancies(next(iter(result.keys())))
-    vac = get_vacancies(' '.join(result.keys()))
+    jobs = get_jobs(result.keys(), 5)
 
-    # result = {'noclass': 0.1, 'python': 0.2}
     response = {
         'lang': result,
-        'vacancy': vac,
+        'jobs': jobs,
     }
 
     return Response(json.dumps(response), mimetype='application/json')
@@ -95,15 +92,16 @@ def server_error(e):
     """.format(e), 500
 
 
-def get_vacancies(langs, limit):
+def get_jobs(langs, limit):
     """
-    Returns vacancies stub.
+    Returns jobs stub.
 
     Should be replaces with github-jobs or stackoverflow-jobs API calls.
-    Returns vacancies for the first lang only for testing purpose.
+    Returns jobs for the first lang only for testing purpose.
     """
     tplTitle = '{} job title {}'
     tplDescription = '{} job description {}'
+    tplUrl = 'http://example.org/job/{}'
     locations = ['helsinki', 'moscow', 'saint petersburg']
     lang = next(iter(langs or []), None)
     if lang is None:
@@ -114,6 +112,7 @@ def get_vacancies(langs, limit):
             'title': tplTitle.format(lang, i),
             'description': tplDescription.format(lang, i),
             'location': random.choice(locations),
+            'url': tplUrl.format(i),
             })
     return result
 
