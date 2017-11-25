@@ -142,13 +142,18 @@ def report(session):
     result = load_result(session)
     if result is None:
         return flask.abort(404)
+
     res = make_response(render_template('index.html', data={
         'session': session,
         'face': image_url_path(session),
         'cropped': True,
         'lang': result,
         'jobs': get_jobs(result.keys(), 5),
+        'description': ' '.join([f'{lang.title()}: {result[lang]}.' for lang in
+                                 result]) if result else 'It seems you are not programmer yet.',
+        'base_url': request.base_url
     }))
+
     res.headers['Access-Control-Allow-Origin'] = '*'
     return res
 
