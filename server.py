@@ -11,7 +11,7 @@ from typing import Mapping, Optional
 
 import flask
 from PIL import Image
-from flask import Flask, Request, Response, render_template, request, send_from_directory
+from flask import Flask, Request, Response, render_template, request, send_from_directory, make_response
 
 import opencv
 from imagenet.lib.label_image import FacesClassificator
@@ -92,7 +92,9 @@ def load_result(session: str) -> Optional[Mapping[str, float]]:
 
 @app.route('/')
 def hello():
-    return render_template('index.html')
+    res = make_response(render_template('index.html'))
+    res.headers['Access-Control-Allow-Origin'] = '*'
+    return res
 
 
 @app.route('/decode', methods=['POST'])
@@ -140,13 +142,15 @@ def report(session):
     result = load_result(session)
     if result is None:
         return flask.abort(404)
-    return render_template('index.html', data={
+    res = make_response(render_template('index.html', data={
         'session': session,
         'face': image_url_path(session),
         'cropped': True,
         'lang': result,
         'jobs': get_jobs(result.keys(), 5),
-    })
+    }))
+    res.headers['Access-Control-Allow-Origin'] = '*'
+    return res
 
 
 @app.errorhandler(500)
