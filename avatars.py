@@ -45,7 +45,7 @@ def learn_dir(lang) -> str:
 
 def lang_users_pages(lang: str):
     result = []
-    for page in range(1, 10):
+    for page in range(1, 21):
         page_path = '%s/users.%d.html' % (lang_dir(lang), page)
         if os.path.exists(page_path):
             with open(page_path) as f:
