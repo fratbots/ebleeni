@@ -3,6 +3,7 @@
 import json
 import logging
 import os
+import random
 import uuid
 from binascii import a2b_base64
 
@@ -11,9 +12,6 @@ from flask import Flask, Request, Response, render_template, request, send_from_
 
 import opencv
 from imagenet.lib.label_image import FacesClassificator
-from web import lib
-
-import random
 
 classifier = FacesClassificator()
 app = Flask(__name__, static_url_path='/static', static_folder='web/static', template_folder='web/templates')
@@ -60,11 +58,13 @@ def hello():
 def decode():
     path = save_posted_image(request)
     try:
-        crop_face(path)
+        cropped = crop_face(path)
         result = classifier.get_probabilities(path)
-        cleanup_image(path)
+        # cleanup_image(path)
+        if not cropped:
+            result['noclass'] = 1.0
     except Exception:
-        cleanup_image(path)
+        # cleanup_image(path)
         result = {}
 
     jobs = get_jobs(result.keys(), 5)
@@ -112,7 +112,7 @@ def get_jobs(langs, limit):
             'description': tplDescription.format(lang, i),
             'location': random.choice(locations),
             'url': tplUrl.format(i),
-            })
+        })
     return result
 
 
