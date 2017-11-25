@@ -1,2 +1,2 @@
 run:
-	./web/server.py
+	./server.py
