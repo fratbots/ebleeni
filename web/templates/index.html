@@ -105,10 +105,8 @@
                 resultsInner.innerHTML = resultsStr;
                 results.classList.remove('disabled');
                 var jobsStr = '<ul>';
-                console.log(data.jobs);
                 for (var jobKey in data.jobs) {
                     var job = data.jobs[jobKey];
-                    console.log(job);
                     jobsStr += '<li>';
                     jobsStr += '<h3><a href="' + job['url'] + '">' + escapeHTML(job['title']) + '</a></h3>';
                     jobsStr += '<p class="description">' + escapeHTML(job['description']) + '</p>';
