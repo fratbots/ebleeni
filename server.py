@@ -149,8 +149,7 @@ def report(session):
         'cropped': True,
         'lang': result,
         'jobs': get_jobs(result.keys(), 5),
-        'description': ' '.join([f'{lang.title()}: {result[lang]}.' for lang in
-                                 result]) if result else 'It seems you are not programmer yet.',
+        'description': ' '.join([f'{lang.title()}: {result[lang]}.' for lang in result]) if result else 'It seems you are not programmer yet.',
         'base_url': request.base_url
     }))
 
