@@ -11,10 +11,13 @@
             #container{margin-top:1em;text-align:center;}
             #btn{margin-top:20px;}
             #btn.disabled{color:#666;background-color:#CCC;border-color:#AAA;}
+            #btn.hidden{display:none;}
             #photo{position:relative;top:0;border:6px #FFF dashed;border-radius:4px;}
             #photo.disabled{display:none;}
             #video{position:relative;top:0;border:6px #FFF dashed;border-radius:4px;}
             #video.disabled{display:none;}
+            #report-img{position:relative;top:0;border:6px #FFF dashed;border-radius:4px;display:inline-block;}
+            #report-img.disabled{display:none;}
             #resjobs{margin-top:2em;margin-bottom:2em;}
             #resjobs.disabled{display:none;}
             #results{display:inline-block;align-items:center;justify-content:center;text-align:left;vertical-align:top;}
@@ -33,6 +36,7 @@
             <div id="photo-container">
                 <video id="video" width="320" height="240" autoplay></video>
                 <canvas class="disabled" id="photo" width="320" height="240"></canvas>
+                <div class="disabled" id="report-img"></div>
             </div>
             <button class="button-primary" id="btn" type="button">Decode face</button>
             <div class="disabled" id="resjobs">
@@ -54,6 +58,7 @@
             }
             var photo = document.getElementById('photo');
             var video = document.getElementById('video');
+            var reportImg = document.getElementById('report-img');
             var photoContext = photo.getContext('2d');
             var btn = document.getElementById('btn');
             var results = document.getElementById('results');
@@ -87,6 +92,13 @@
             }
 
             function setModeResults(data) {
+                {% if data %}
+                    reportImg.innerHTML = '<img src="' + data.face + '">';
+                    reportImg.classList.remove('disabled');
+                    btn.classList.add('hidden');
+                    photo.classList.add('disabled');
+                    video.classList.add('disabled');
+                {% endif %}
                 mode = 'results';
                 btn.classList.remove('disabled');
                 btn.firstChild.data = 'Try again';
