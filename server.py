@@ -6,6 +6,7 @@ from binascii import a2b_base64
 from flask import Flask, Response, render_template, request, send_from_directory
 
 from imagenet.lib.label_image import FacesClassificator
+from web.lib.github import get_vacancies
 
 app = Flask(__name__, static_url_path='/static', static_folder='web/static', template_folder='web/templates')
 
@@ -27,10 +28,19 @@ def decode():
     with open(filepath, 'wb') as f:
         f.write(binData)
     
+    # Get programming languages
     classificator = FacesClassificator()
     result = classificator.get_probabilities(filepath)
     
-    return Response(json.dumps(result), mimetype='application/json')
+    # Get vacansions
+    vac = get_vacancies(next(iter(result.keys())))
+    
+    response = {
+        'lang': result,
+        'vacancy': vac,
+    }
+    
+    return Response(json.dumps(response), mimetype='application/json')
 
 
 @app.route('/static/<path:path>')
