@@ -12,7 +12,6 @@ from flask import Flask, Request, Response, render_template, request, send_from_
 import opencv
 from imagenet.lib.label_image import FacesClassificator
 from web import lib
-from web.lib.github import get_vacancies
 
 import random
 
