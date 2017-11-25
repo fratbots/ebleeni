@@ -21,11 +21,12 @@
             #results ul,#results li:last-child{margin-bottom:0;}
             #jobs{display:flex;align-items:center;justify-content:center;text-align:left;margin-top:2em;margin-bottom:2em;}
             #jobs.disabled{display:none;}
-            #jobs-inner{margin-top:0;padding:20px;background-color:rgba(255,255,255,0.75);border-radius:4px;}
+            #jobs-inner{margin-top:0;margin-left:2em;margin-right:2em;padding:2em;background-color:rgba(255,255,255,0.75);border-radius:4px;}
             #jobs li{list-style:none;}
             #jobs li:last-child{margin-bottom:0;}
             #jobs h3{margin-bottom:0.3em;}
             #jobs .location{margin-bottom:0;font-size:0.7em;font-weight:bold;color:#666;}
+            #jobs .description{max-height:200px;overflow-y:auto;}
         </style>
     </head>
     <body>
@@ -117,7 +118,7 @@
                     jobsStr += '<li>';
                     jobsStr += '<h3><a href="' + job['url'] + '">' + escapeHTML(job['title']) + '</a></h3>';
                     jobsStr += '<p class="location">' + escapeHTML(job['location']) + '</p>';
-                    jobsStr += '<p class="description">' + job['description'] + '</p>';
+                    jobsStr += '<div class="description">' + job['description'] + '</div>';
                     jobsStr += '</li>';
                 }
                 jobsStr += '</ul>';
