@@ -7,7 +7,7 @@ import random
 import uuid
 from binascii import a2b_base64
 from collections import OrderedDict
-from typing import Mapping, Optional
+from typing import Mapping, Optional, List
 
 import flask
 from PIL import Image
@@ -92,6 +92,10 @@ def load_result(session: str) -> Optional[Mapping[str, float]]:
     return None
 
 
+def lang_result_to_list(result: Mapping[str, float]) -> List[List]:
+    return [[key, value] for key, value in result.items()]
+
+
 @app.route('/')
 def hello():
     res = make_response(render_template('index.html'))
@@ -129,7 +133,7 @@ def decode():
         'session': session,
         'face': '',
         'cropped': False if cropped_path is None else True,
-        'lang': result,
+        'lang': lang_result_to_list(result),
         'jobs': jobs,
     }
 
@@ -160,7 +164,7 @@ def report(session):
         'session': session,
         'face': image_url_path(session),
         'cropped': True,
-        'lang': result,
+        'lang': lang_result_to_list(result),
         'jobs': get_jobs(result.keys(), 5),
         'description': description,
         'base_url': request.base_url
