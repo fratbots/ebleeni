@@ -64,7 +64,11 @@
             <div id="photo-container">
                 <video id="video" width="320" height="240" autoplay></video>
                 <canvas class="disabled" id="photo" width="320" height="240"></canvas>
-                <div class="disabled" id="report-img"></div>
+                <div class="disabled" id="report-img">
+                    {% if data %}
+                    <img src="{{ data.face }}">
+                    {% endif %}
+                </div>
             </div>
             <button class="button-primary" id="btn" type="button">Decode face</button>
             <div class="disabled" id="resjobs">
