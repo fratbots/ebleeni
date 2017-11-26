@@ -97,6 +97,13 @@ def hello():
     return res
 
 
+@app.route('/_info')
+def info():
+    return Response(json.dumps({
+        'version': '1.0.0',
+    }), mimetype='application/json')
+
+
 @app.route('/decode', methods=['POST'])
 def decode():
     session = make_session()
