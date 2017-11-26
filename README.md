@@ -55,7 +55,7 @@ To train the NN were looking for github avatars of users, written code on specif
 
 #### Filter data
 
-We used OpenCV to clear out avatars with no human face. Then we cropped each image with the face bounds offered by OpenCV.
+We used `OpenCV` to clear out avatars with no human face. Then we cropped each image with the face bounds offered by `OpenCV`.
 
 #### Retrain model
 
@@ -63,6 +63,9 @@ We use Google Inception neural network as classifier. I must confess, we didn't 
 
 To some quality improvements we tested different hyperparameters like NN architecture, number of iterations and learning rate.
 
+Use `Retrain.ipynb` notebook to train and test model.
+
 #### Make it available on the web
 
 GoogleAppEngine don't appreciate hube amount of work so we uploaded lightweight model to work on the web.
+It is quantified version of NN with mobilenet v0.50 architecture works with 128x128 images.
