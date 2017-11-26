@@ -12,8 +12,8 @@ clean:
 
 build:
 	docker build -t $(image) ./
-	docker save $(image) > $(image_file)
 
 deploy:
+	docker save $(image) > $(image_file)
 	echo 'scp $(image_file) user@host:/tmp/$(image_file); ssh -c "docker load -i /tmp/$(image_file)"'
 	# docker run -v /persistent/faces:/app/web/faces
