@@ -11,7 +11,7 @@ clean:
 	rm -rf ./web/faces/ebleeni-*
 
 build:
-	docker build -t $(image) ./
+	docker build -t $(image) -f Dockerfile-digitalocean ./
 
 deploy:
 	docker save $(image) > $(image_file)
@@ -19,7 +19,7 @@ deploy:
 	# docker run -v /persistent/faces:/app/web/faces
 
 ae-build:
-	docker build -t $(image) -f Dockerfile-AE ./
+	docker build -t $(image) ./
 
 ae-deploy:
-    gcloud app deploy
+	gcloud app deploy

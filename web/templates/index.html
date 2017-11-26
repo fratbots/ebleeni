@@ -102,6 +102,8 @@
                 video.classList.remove('disabled');
                 resjobs.classList.add('disabled');
 
+                window.history.pushState( {} , '', '/');
+
                 destroyShareButtons();
             }
             function setModeWaiting() {
@@ -168,6 +170,11 @@
 
                 // Draw social buttons
                 showShareButtons(data);
+
+                // Set history api
+                if (data.cropped) {
+                    window.history.pushState( {} , '', '/report/' + data.session);
+                }
             }
 
             function showShareButtons(data) {
