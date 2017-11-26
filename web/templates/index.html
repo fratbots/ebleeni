@@ -38,6 +38,8 @@
             #jobs ul{margin-bottom:0;}
             #jobs li{list-style:none;}
             #jobs li:last-child{margin-bottom:0;}
+            .ya-share2__container_size_m {padding-bottom:2em;}
+            .ya-share2__container_size_m .ya-share2__badge .ya-share2__icon {width: 45px; height:45px;}
         </style>
 
         <script src="https://yastatic.net/es5-shims/0.0.2/es5-shims.min.js"></script>
@@ -180,6 +182,11 @@
                         title: 'Ebleeni! Your programming prerogative!',
                         description: description,
                         image: imageUrl
+                    },
+                    theme: {
+                        services: 'vkontakte,facebook,twitter,linkedin,reddit,whatsapp,telegram',
+                        counter: true,
+                        size: 'm',
                     }
                    // здесь вы можете указать и другие параметры
                 });
