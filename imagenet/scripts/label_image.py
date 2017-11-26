@@ -61,4 +61,4 @@ if __name__ == "__main__":
     classes = classificator.get_probabilities(file_name, debug=True)
     
     for name, prob in sorted(classes.items()):
-        print(f'{name}: {prob}')
+        print('{}: {}'.format(name, prob))
