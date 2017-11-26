@@ -2,6 +2,6 @@
 imagenet/tf_files
 imagenet/.ipynb_checkpoints
 .git
-google-cloud-sdk
-web/faces
+web/faces/*.*
+!web/faces/.gitkeep
 data

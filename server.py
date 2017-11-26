@@ -61,7 +61,7 @@ def save_posted_image(session: str, req: Request) -> str:
     file_ext = head.split(';')[0].split('/')[1]
     data = a2b_base64(data)
     path = image_path(session, file_ext)
-    with open(path, 'wb') as f:
+    with open(path, 'wb+') as f:
         f.write(data)
     return path
 
