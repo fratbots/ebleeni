@@ -1,7 +1,8 @@
-ebleeni
+Ebleeni
 =======
 
-Reads your face to tell which programming language best suits you.
+Reads your face (and mind, of course), to foresee which programming language suits you the best.
+Don't hesitate to be recognized! Event if you're not a programmer, ebleeni will poor oil on troubled water and offer smth. interesting for you!
 
 Setup
 -----
@@ -24,3 +25,13 @@ Deploy docker image
 -------------------
 
     DEPLOY_USER=myuser DEPLOY_HOST=myhost DEPLOY_PATH=/persistent/path DEPLOY_TMP_PATH=/persistent/path/tmp make deploy
+
+App Engine
+----------
+Build:
+
+    make ae-build
+
+Deploy:
+
+    make ae-deploy
