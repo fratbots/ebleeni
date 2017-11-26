@@ -138,7 +138,10 @@
                 }
                 var resultsStr = '';
                 if (has_noclass) {
-                    resultsStr += '<p>It seems you are not programmer yet.<br>We think the following languages suits you best:</p>'
+                    resultsStr += '<p>It seems you are not programmer yet.';
+                    if (Object.keys(data.jobs).length > 0) {
+                        resultsStr += '<br>We think the following languages suits you best:</p>';
+                    }
                 }
                 resultsStr += '<ul>';
                 for (var langKey in data.lang) {
