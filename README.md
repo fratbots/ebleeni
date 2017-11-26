@@ -19,3 +19,8 @@ Create docker image
 -------------------
 
     make build
+
+Deploy docker image
+-------------------
+
+    DEPLOY_USER=myuser DEPLOY_HOST=myhost DEPLOY_PATH=/persistent/path DEPLOY_TMP_PATH=/persistent/path/tmp make deploy
